@@ -10,7 +10,11 @@ Tabel: users
 import sqlite3
 import os
 
-DB_FILE = "database.db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+DB_FILE = os.path.abspath(
+    os.path.join(BASE_DIR, "..", "database.db")
+)
 
 # Inisialisasi
 def init_db() -> None:

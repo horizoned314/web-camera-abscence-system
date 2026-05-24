@@ -5,7 +5,7 @@ from db import save_user, npm_exists
 
 # Konfigurasi
 DATASET_DIR   = "dataset"
-SAMPLE_TARGET = 100          # jumlah foto yang diambil per orang
+SAMPLE_TARGET = 50          # jumlah foto yang diambil per orang
 SAMPLE_DELAY  = 5           # ambil foto setiap N frame (hindari duplikat)
 
 # Input data mahasiswa

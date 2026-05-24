@@ -1,0 +1,55 @@
+/* ── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1e2535; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #2d3748; }
+
+/* ── Selection ─────────────────────────────────────────── */
+::selection { background: rgba(99, 102, 241, 0.25); color: #e0e7ff; }
+
+/* ── Font smoothing ────────────────────────────────────── */
+body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+/* ── Filter button active state ────────────────────────── */
+.filter-btn.active-filter {
+  background-color: #1e2535;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Table row highlight on new hadir ──────────────────── */
+@keyframes row-flash {
+  0%   { background-color: rgba(34, 197, 94, 0.15); }
+  100% { background-color: transparent; }
+}
+.row-new-hadir { animation: row-flash 2s ease-out forwards; }
+
+/* ── Toast enter/exit ──────────────────────────────────── */
+.toast-enter { animation: toast-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.toast-exit  { animation: toast-out 0.25s ease-in forwards; }
+
+@keyframes toast-in {
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes toast-out {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(110%); opacity: 0; }
+}
+
+/* ── Modal backdrop ────────────────────────────────────── */
+#reset-modal.modal-open { display: flex; }
+
+/* ── Stat number transition ────────────────────────────── */
+.stat-num { transition: all 0.3s ease; }
+
+/* ── Mono font for NPM ─────────────────────────────────── */
+.font-npm { font-family: 'DM Mono', ui-monospace, monospace; font-size: 0.75rem; }
+
+/* ── Progress bar (attendance %) ───────────────────────── */
+.progress-bar {
+  height: 3px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #6366f1, #22c55e);
+  transition: width 0.5s ease;
+}

@@ -1,4 +1,5 @@
 .venv
-trainer/*
-dataset/*
+__pycache__/
+core/trainer/*
+core/dataset/*
 database.db
