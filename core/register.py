@@ -1,3 +1,4 @@
+import time
 import cv2
 import os
 import json
@@ -5,8 +6,10 @@ from db import save_user, npm_exists
 
 # Konfigurasi
 DATASET_DIR   = "dataset"
-SAMPLE_TARGET = 50          # jumlah foto yang diambil per orang
+SAMPLE_TARGET = 40         # jumlah foto yang diambil per orang
 SAMPLE_DELAY  = 5           # ambil foto setiap N frame (hindari duplikat)
+
+os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp|fflags;nobuffer|flags;low_delay"
 
 # Input data mahasiswa
 print("=" * 40)
@@ -29,9 +32,13 @@ user_dir = os.path.join(DATASET_DIR, npm)
 os.makedirs(user_dir, exist_ok=True)
 
 # Setup kamera & detektor
-cam = cv2.VideoCapture(0)
+ESP_URL = "http://192.168.1.26/stream?buffer_size=1024&fifo_size=100000&overrun_nonfatal=1"
+cam = cv2.VideoCapture(ESP_URL, cv2.CAP_FFMPEG)
+cam.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+cam.set(cv2.CAP_PROP_FPS, 10)
+
 if not cam.isOpened():
-    print("[ERROR] Kamera tidak dapat dibuka.")
+    print("[ERROR] Kamera ESP32 tidak bisa dibuka.")
     exit(1)
 
 face_cascade = cv2.CascadeClassifier(
@@ -41,17 +48,27 @@ face_cascade = cv2.CascadeClassifier(
 sample_count = 0
 frame_count  = 0
 
-print(f"\n[INFO] Kamera aktif. Hadapkan wajah ke kamera.")
+print(f"\n[INFO] Kamera aktif.")
 print(f"[INFO] Akan mengambil {SAMPLE_TARGET} foto. Tekan ESC untuk batal.\n")
 
 # Loop pengambilan foto
 while True:
+
+    cam.grab()
     ret, frame = cam.read()
-    if not ret:
-        print("[ERROR] Gagal membaca frame kamera.")
-        break
+
+    if not ret or frame is None:
+        print("[WARN] Stream drop, reconnect...")
+        cam.release()
+        time.sleep(1)
+
+        cam = cv2.VideoCapture(ESP_URL, cv2.CAP_FFMPEG)
+        cam.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        cam.set(cv2.CAP_PROP_FPS, 10)
+        continue
 
     frame_count += 1
+
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     faces = face_cascade.detectMultiScale(
@@ -61,7 +78,7 @@ while True:
         minSize=(80, 80),
     )
 
-    display = frame.copy()
+    display =  frame.copy()
 
     for (x, y, w, h) in faces:
         # Simpan foto hanya setiap SAMPLE_DELAY frame agar tidak terlalu mirip
@@ -112,6 +129,8 @@ while True:
     )
 
     cv2.imshow("Registrasi Wajah - ESC untuk batal", display)
+
+    time.sleep(0.03)
 
     key = cv2.waitKey(1)
     if key == 27:  # ESC → batal
